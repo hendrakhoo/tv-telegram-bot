@@ -11,15 +11,26 @@ CHAT_ID = os.environ.get("CHAT_ID")
 def webhook():
     data = request.json
 
-    symbol = data.get("symbol", "N/A")
-    price = data.get("price", "N/A")
     signal = data.get("signal", "N/A")
-    timeframe = data.get("timeframe", "")
+    symbol = data.get("symbol", "N/A")
+    entry = data.get("entry", "N/A")
+    sl = data.get("sl", "N/A")
+    tp1 = data.get("tp1", "N/A")
+    tp2 = data.get("tp2", "N/A")
+    reason = data.get("reason", "N/A")
 
     message = f"""
-🚀 {signal} {symbol}
-💰 Price: {price}
-⏰ TF: {timeframe}
+📊 TRADE SIGNAL
+
+🚀 Direction: {signal} {symbol}
+
+💰 Entry: {entry}
+🛑 SL: {sl}
+🎯 TP1: {tp1}
+🎯 TP2: {tp2}
+
+📌 Reason:
+{reason}
 """
 
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
