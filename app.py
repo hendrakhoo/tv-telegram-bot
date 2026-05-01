@@ -24,7 +24,7 @@ def webhook():
 📊 TRADE SIGNAL
 
 🚀 Direction: {signal} {symbol}
-⏰ Timeframe: {timeframe}
+⏰ Timeframe: {timeframe.period}
 
 💰 Entry: {entry}
 🛑 SL: {sl}
