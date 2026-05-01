@@ -18,13 +18,13 @@ def webhook():
     tp1 = data.get("tp1", "N/A")
     tp2 = data.get("tp2", "N/A")
     reason = data.get("reason", "N/A")
-    timeframe = data.get("timeframe", "N/A")
+    timeframe = data.get("timeframe.period", "N/A")
 
     message = f"""
 📊 TRADE SIGNAL
 
 🚀 Direction: {signal} {symbol}
-⏰ Timeframe: {timeframe.period}
+⏰ Timeframe: {timeframe}
 
 💰 Entry: {entry}
 🛑 SL: {sl}
