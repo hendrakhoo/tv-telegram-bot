@@ -1,3 +1,18 @@
+from flask import Flask, request, jsonify
+import requests
+import os
+import time
+import json
+
+# ✅ create flask app FIRST
+app = Flask(__name__)
+
+BOT_TOKEN = os.environ.get("BOT_TOKEN")
+CHAT_ID = os.environ.get("CHAT_ID")
+
+# store latest signal
+latest_signal = {}
+
 @app.route('/webhook', methods=['POST'])
 def webhook():
     global latest_signal
