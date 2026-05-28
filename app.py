@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 import requests
 import os
 import time
+import json
 
 app = Flask(__name__)
 
@@ -15,7 +16,26 @@ latest_signal = {}
 def webhook():
     global latest_signal
 
-    data = request.json or {}
+    data = {}
+
+    try:
+        # ✅ Try normal JSON first
+        if request.is_json:
+            data = request.get_json()
+
+        else:
+            # ✅ Fallback to raw body text
+            raw_data = request.data.decode('utf-8')
+            print("Raw incoming data:", raw_data)
+
+            # Try converting raw string into JSON
+            data = json.loads(raw_data)
+
+    except Exception as e:
+        print("JSON parse error:", str(e))
+
+        # fallback empty object
+        data = {}
 
     # ✅ extract fields safely
     signal = data.get("signal", "N/A")
@@ -27,7 +47,7 @@ def webhook():
     reason = data.get("reason", "N/A")
     timeframe = data.get("timeframe", "N/A")
 
-    # ✅ generate unique ID (for cBot duplicate prevention)
+    # ✅ generate unique ID
     signal_id = str(int(time.time()))
 
     # ✅ store for cBot
@@ -43,8 +63,16 @@ def webhook():
         "timestamp": time.time()
     }
 
-    # ✅ nicer formatting (BUY/SELL color)
-    direction_icon = "🟢 BUY" if signal == "BUY" else "🔴 SELL"
+    # ✅ normalize signal
+    signal_upper = str(signal).upper()
+
+    # ✅ BUY / SELL display
+    if signal_upper == "BUY":
+        direction_text = f"🟢 BUY 📈 {symbol}"
+    elif signal_upper == "SELL":
+        direction_text = f"🔴 SELL 📉 {symbol}"
+    else:
+        direction_text = f"⚪ {signal_upper} {symbol}"
 
     message = f"""
 📊 TRADE SIGNAL
@@ -64,6 +92,7 @@ def webhook():
     # ✅ send to Telegram
     try:
         url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+
         response = requests.post(url, json={
             "chat_id": CHAT_ID,
             "text": message
@@ -75,7 +104,10 @@ def webhook():
     except Exception as e:
         print("Telegram error:", str(e))
 
-    return jsonify({"status": "ok"})
+    return jsonify({
+        "status": "ok",
+        "received": data
+    })
 
 
 # ✅ endpoint for cBot
@@ -88,6 +120,7 @@ def get_signal():
 @app.route('/')
 def home():
     return "Bot running"
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
