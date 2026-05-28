@@ -71,7 +71,8 @@ def webhook():
     }
 
     # ✅ direction formatting
-    signal_upper = signal.upper()
+    signal_raw = str(data.get("signal", "N/A"))
+    signal_upper = signal_raw.strip().upper()
 
     if signal_upper == "BUY":
         direction_text = f"🟢 BUY 📈 {symbol}"
